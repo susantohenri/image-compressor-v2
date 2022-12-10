@@ -105,7 +105,7 @@ window.onload = function () {
     });
 
     function getImageSize(URL) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             console.log('url is: ' + URL);
             var dataToSend = {
                 action: 'get_image_size',
@@ -115,11 +115,11 @@ window.onload = function () {
                 type: "POST",
                 url: admin_ajax_url,
                 data: dataToSend,
-                success: function(data) {
+                success: function (data) {
                     console.log("image size is: " + data)
                     resolve(data)
                 },
-                error: function(err) {
+                error: function (err) {
                     reject(err)
                 }
             })
@@ -199,7 +199,7 @@ window.onload = function () {
 
     function updateCompressionPercentage(img2source, previewElem) {
         var img2size = 0
-        getImageSize(img2source).then(function(size) {
+        getImageSize(img2source).then(function (size) {
             img2size = formatBytes(size)
             var img2 = jQuery('#container .img-comp-img img').first()
             var newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(previewElem).find('[data-dz-size]').html()))
@@ -208,7 +208,7 @@ window.onload = function () {
             jQuery(previewElem).find('.percentage').html('-' + newSize + '%')
             jQuery(previewElem).data('image2Size', img2size)
             jQuery(previewElem).data('reducedPercentage', newSize)
-        }).catch(function(err) {
+        }).catch(function (err) {
             // Run this when promise was rejected via reject()
             console.log('error: ' + err)
         })
