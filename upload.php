@@ -63,7 +63,7 @@ function compressor($FILES, $recompress=false){
                     '-quiet',
                 ]);
         $gifSicleObject->setBinaryPath(__DIR__.'/');
-        $JpegoptimObject->setBinaryPath('/home/theelect/');
+        $JpegoptimObject->setBinaryPath(__DIR__.'/');
         $PngquantObject->setBinaryPath(__DIR__.'/');
         $OptipngObject->setBinaryPath(__DIR__.'/');
         $optimizerChain->addOptimizer($JpegoptimObject)
