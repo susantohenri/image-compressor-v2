@@ -77,12 +77,12 @@ function compressor($FILES, $recompress=false){
         $logger=new TestLogger();
 
         $optimizerChain->useLogger($logger)->optimize($pathToImage, $pathToSave);
-        if(isset($logger->recordsByLevel['error'])){
-            echo "<pre>".print_r($logger, true)."</pre>";
-            echo $logger->recordsByLevel['error'][0]['message'];
-            header('HTTP/1.1 400 Invalid file.');
-            die();
-        }
+        // if(isset($logger->recordsByLevel['error'])){
+        //     echo "<pre>".print_r($logger, true)."</pre>";
+        //     echo $logger->recordsByLevel['error'][0]['message'];
+        //     header('HTTP/1.1 400 Invalid file.');
+        //     die();
+        // }
         if(filesize($pathToSave) >= filesize($pathToImage)){
         	//try and see what happens with max compression
         	$jpegQuality = '--max=100'; //0 to 100
@@ -117,11 +117,11 @@ function compressor($FILES, $recompress=false){
                 ->addOptimizer($OptipngObject)
                 ->addOptimizer($gifSicleObject);
         	$optimizerChain->optimize($pathToImage, $pathToSave);
-        	if(filesize($pathToSave) >= filesize($pathToImage)){
-	        	echo 'File size cannot be reduced anymore';
-	            header('HTTP/1.1 400 Invalid file.');
-	            die();
-        	}
+        	// if(filesize($pathToSave) >= filesize($pathToImage)){
+	        // 	echo 'File size cannot be reduced anymore';
+	        //     header('HTTP/1.1 400 Invalid file.');
+	        //     die();
+        	// }
         }
 
         echo "<pre>".print_r($logger, true)."</pre>";

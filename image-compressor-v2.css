@@ -114,11 +114,12 @@
   
   .image-compressor-v2 .remove-icon {
     position: absolute;
-    top: 0;
+    top: 0px;
     z-index: 10000;
     right: 0;
     cursor: pointer;
     color: #e30c0c;
+    font-size: 20px;
   }
   
   .image-compressor-v2 .dz-c-filename {
@@ -451,12 +452,16 @@
     color: #ffffff;
     transform: translate(-50%, -50%);
   }
-  
-  .image-compressor-v2 .download-link {
+
+  .image-compressor-v2 .download-link-wrapper {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .image-compressor-v2 .borderedPreview {
@@ -469,4 +474,5 @@
 
   .image-compressor-v2 .adjuster {
     display: flex;
+    gap: 10px;
   }

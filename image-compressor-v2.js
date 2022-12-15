@@ -2,7 +2,23 @@ window.onload = function () {
     var plugin_dir_url = jQuery('input[name="plugin_dir_url"]').val()
     var admin_ajax_url = jQuery('input[name="admin_ajax_url"]').val()
 
+
+    var mySlider = new RangeSliderPips({
+        target: document.querySelector("#my-slider"),
+        props: {
+            min: 1,
+            max: 100,
+            vertical: true,
+            values: [80],
+            float: true,
+        }
+    });
+    mySlider.$on('change', function (e) {
+        jQuery('#value_in_number').html(e.detail.value);
+    });
+
     var myDropzone = new Dropzone("#dropzone", {
+        previewTemplate: jQuery('#previewTemplate').html(),
         filesizeBase: 1024,
         maxThumbnailFilesize: 1000,
         clickable: '.image-compressor-v2 #uploadBtn',
@@ -37,13 +53,14 @@ window.onload = function () {
                 jQuery('#clearQBtn').removeClass('disabled')
                 jQuery('#downloadAllBtn').removeClass('disabled')
 
-                var img2source = plugin_dir_url + 'uploads'
+                var img2source = plugin_dir_url + 'uploads/'
                 img2source += 'optimized' + file.upload.filename
                 file.previewElement.addEventListener("click", previewFunc)
                 registerBorderCss(file.previewElement)
 
                 //make download button working
                 var downloadButton = jQuery(file.previewElement).find('.download-link')
+                console.log('downloadButton: ', downloadButton)
                 downloadButton.on('click', function (e) {
                     e.preventDefault()
                     downloadURI(img2source + '?time=' + Math.floor(Date.now() / 1000), jQuery(file.previewElement).find('.dz-c-filename span').html())
@@ -106,12 +123,11 @@ window.onload = function () {
 
     function getImageSize(URL) {
         return new Promise(function (resolve, reject) {
-            console.log('url is: ' + URL);
             var dataToSend = {
                 action: 'get_image_size',
                 url: URL
             };
-            $.ajax({
+            jQuery.ajax({
                 type: "POST",
                 url: admin_ajax_url,
                 data: dataToSend,
@@ -148,25 +164,24 @@ window.onload = function () {
         jQuery('.custom_wrapper_two').removeClass('display-none')
 
         if (this === window) {
-            console.log('recompression')
+            // console.log('recompression')
         } else {
-            console.log('first compression, here this is: ')
-            console.log(this)
+            // console.log('first compression, here this is: ')
+            // console.log(this)
             lastPreviewElement = this
         }
+
         var filename = jQuery(lastPreviewElement).find('.dz-c-filename span').html()
-        var img1source = plugin_dir_url + 'uploads/'
-        img1source += filename
-        var img2source = plugin_dir_url + 'uploads/'
-        img2source += 'optimized' + filename
+        var img1source = plugin_dir_url + 'uploads/' + filename
+        var img2source = plugin_dir_url + 'uploads/' + 'optimized' + filename
 
         var previewElementV = jQuery(lastPreviewElement)
-        console.log('img1source is: ' + img1source + ' img2source: ' + img2source)
+        // console.log('img1source is: ' + img1source + ' img2source: ' + img2source)
         //change image one
-        console.log(jQuery('#container .img-comp-img img'))
+        // console.log(jQuery('#container .img-comp-img img'))
         var afterImage = new Image()
         jQuery(afterImage).on('load', function () {
-            console.log(afterImage)
+            // console.log(afterImage)
             jQuery('#container .img-comp-img img').first().attr('src', this.src)
             updateCompressionPercentage(this.src, lastPreviewElement)
             var img2size = 0
@@ -175,7 +190,7 @@ window.onload = function () {
                 var img2 = jQuery('#container .img-comp-img img').first()
                 var newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(lastPreviewElement).find('[data-dz-size]').html()))
                 newSize = Number(newSize).toFixed(2)
-                console.log('image 2 latest size is: ' + img2size)
+                // console.log('image 2 latest size is: ' + img2size)
                 jQuery(lastPreviewElement).find('.percentage').html('-' + newSize + '%')
                 jQuery(lastPreviewElement).data('image2Size', img2size)
                 jQuery(lastPreviewElement).data('reducedPercentage', newSize)
@@ -209,7 +224,6 @@ window.onload = function () {
             jQuery(previewElem).data('image2Size', img2size)
             jQuery(previewElem).data('reducedPercentage', newSize)
         }).catch(function (err) {
-            // Run this when promise was rejected via reject()
             console.log('error: ' + err)
         })
     }
