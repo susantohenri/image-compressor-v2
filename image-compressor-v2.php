@@ -113,8 +113,9 @@ add_shortcode('image-compressor-v2', function () {
                 <div class='text-before'><strong></strong></div>
                 <div class='text-after'><strong></strong></div>
             </div>
-            <div class='custom_wrapper_two adjuster display-none'>
-                <div id='container' class='img-comp-container'>
+            <div class='custom_wrapper_two adjuster display-nonex'>
+                <div id='JXSlider'></div>
+                <div id='container' class='img-comp-container display-none'>
                     <div class='img-comp-img'>
                         <img class='image' src='{$plugin_dir_url}giphy.gif'>
                     </div>

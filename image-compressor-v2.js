@@ -2,6 +2,23 @@ window.onload = function () {
     var plugin_dir_url = jQuery('input[name="plugin_dir_url"]').val()
     var admin_ajax_url = jQuery('input[name="admin_ajax_url"]').val()
 
+    let slider = new juxtapose.JXSlider('#JXSlider',
+        [
+            {
+                src: plugin_dir_url + 'uploads/bg_auth.jpg',
+            },
+            {
+                src: plugin_dir_url + 'uploads/bg_auth.jpg',
+            }
+        ],
+        {
+            animate: true,
+            showLabels: true,
+            showCredits: true,
+            startingPosition: "50%",
+            makeResponsive: true
+        }
+    )
 
     var mySlider = new RangeSliderPips({
         target: document.querySelector("#my-slider"),
@@ -13,9 +30,10 @@ window.onload = function () {
             float: true,
         }
     });
+
     mySlider.$on('change', function (e) {
-        jQuery('#value_in_number').html(e.detail.value);
-    });
+        jQuery('#value_in_number').html(e.detail.value)
+    })
 
     var myDropzone = new Dropzone("#dropzone", {
         previewTemplate: jQuery('#previewTemplate').html(),
@@ -58,16 +76,13 @@ window.onload = function () {
                 file.previewElement.addEventListener("click", previewFunc)
                 registerBorderCss(file.previewElement)
 
-                //make download button working
                 var downloadButton = jQuery(file.previewElement).find('.download-link')
-                console.log('downloadButton: ', downloadButton)
                 downloadButton.on('click', function (e) {
                     e.preventDefault()
                     downloadURI(img2source + '?time=' + Math.floor(Date.now() / 1000), jQuery(file.previewElement).find('.dz-c-filename span').html())
                     downloadButton.off('click')
                 })
 
-                //show percentage of compression
                 updateCompressionPercentage(img2source, file.previewElement)
 
 
@@ -98,7 +113,6 @@ window.onload = function () {
             })
 
             this.on('error', function (file, message) {
-                console.log(file)
                 jQuery("#clickPreventer").fadeOut()
                 jQuery(file.previewElement).find('.loader').fadeOut()
                 if (this.files.length > 20 /* maxFiles=20*/) {
@@ -130,33 +144,29 @@ window.onload = function () {
         link.remove()
     }
 
-    jQuery('#downloadAllBtn').on('click', function(e) {
+    jQuery('#downloadAllBtn').on('click', function (e) {
         e.preventDefault()
-        console.log('mulai download')
-        console.log(myDropzone.files)
         var links = []
         for (var i = myDropzone.files.length - 1; i >= 0; i--) {
             if (myDropzone.files[i].status == "success") {
                 links.push('optimized' + myDropzone.files[i].name)
             }
         }
-        // console.log(links);
+        
         var dataToSend = {}
         dataToSend['files'] = links
         dataToSend['action'] = 'download_all_button'
-        console.log('dataToSend:', dataToSend)
+        
         jQuery.ajax({
             url: admin_ajax_url,
             data: dataToSend,
             type: 'POST',
-            success: function(data) {
-                console.log('data:', data)
+            success: function (data) {
                 downloadURI(data, 'compressedImages.zip')
             },
-            failure: function(data) {},
-            error: function(data) {}
+            failure: function (data) { },
+            error: function (data) { }
         })
-        console.log('selesai download')
     })
 
     function getImageSize(URL) {
@@ -204,8 +214,6 @@ window.onload = function () {
         if (this === window) {
             // console.log('recompression')
         } else {
-            // console.log('first compression, here this is: ')
-            // console.log(this)
             lastPreviewElement = this
         }
 
@@ -214,12 +222,8 @@ window.onload = function () {
         var img2source = plugin_dir_url + 'uploads/' + 'optimized' + filename
 
         var previewElementV = jQuery(lastPreviewElement)
-        // console.log('img1source is: ' + img1source + ' img2source: ' + img2source)
-        //change image one
-        // console.log(jQuery('#container .img-comp-img img'))
         var afterImage = new Image()
         jQuery(afterImage).on('load', function () {
-            // console.log(afterImage)
             jQuery('#container .img-comp-img img').first().attr('src', this.src)
             updateCompressionPercentage(this.src, lastPreviewElement)
             var img2size = 0
@@ -228,7 +232,6 @@ window.onload = function () {
                 var img2 = jQuery('#container .img-comp-img img').first()
                 var newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(lastPreviewElement).find('[data-dz-size]').html()))
                 newSize = Number(newSize).toFixed(2)
-                // console.log('image 2 latest size is: ' + img2size)
                 jQuery(lastPreviewElement).find('.percentage').html('-' + newSize + '%')
                 jQuery(lastPreviewElement).data('image2Size', img2size)
                 jQuery(lastPreviewElement).data('reducedPercentage', newSize)
@@ -236,7 +239,6 @@ window.onload = function () {
                 jQuery('.text-after > strong').html('Compressed: ' + image2Size + ' (-' + jQuery(lastPreviewElement).data('reducedPercentage') + '%)')
                 jQuery(afterImage).off('load')
             }).catch(function (err) {
-                // Run this when promise was rejected via reject()
                 console.log('error: ' + err)
             })
 
@@ -264,5 +266,44 @@ window.onload = function () {
         }).catch(function (err) {
             console.log('error: ' + err)
         })
+    }
+
+    jQuery('#quality_form_submit').on('click', function(e) {
+        e.preventDefault()
+        // jQuery('#clickPreventer').fadeIn()
+        var dataToSend = {}
+        var optimizedfilename = plugin_dir_url + 'uploads/optimizedbg_auth.jpg'
+        var originalfilename = plugin_dir_url + 'uploads/bg_auth.jpg'
+        dataToSend['action'] = 'quality_change_of_picture'
+        dataToSend['quality'] = jQuery('#value_in_number').html()
+        dataToSend['originalfilename'] = originalfilename
+        dataToSend['optimizedfilename'] = optimizedfilename
+
+        recompress(dataToSend).then(function(data) {
+            console.log(data)
+            previewFunc()
+            // jQuery('#clickPreventer').fadeOut()
+        }).catch(function(err) {
+            // alert("error")
+            console.log(err)
+            // jQuery('#clickPreventer').fadeOut()
+        })
+
+    })
+
+    function recompress(dataToSend) {
+        return new Promise(function(resolve, reject) {
+            jQuery.ajax({
+                url: admin_ajax_url,
+                data: dataToSend,
+                type: 'POST',
+                success: function(data) {
+                    resolve(data)
+                },
+                error: function(err) {
+                    reject(err)
+                }
+            });
+        });
     }
 }
