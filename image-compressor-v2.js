@@ -117,9 +117,47 @@ window.onload = function () {
     })
 
     jQuery('#clearQBtn').on('click', function () {
-        myDropzone.removeAllFiles();
+        myDropzone.removeAllFiles()
         // $('dz-preview').remove();
     });
+
+    function downloadURI(uri, name) {
+        var link = document.createElement("a")
+        link.setAttribute('download', name)
+        link.href = uri
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+    }
+
+    jQuery('#downloadAllBtn').on('click', function(e) {
+        e.preventDefault()
+        console.log('mulai download')
+        console.log(myDropzone.files)
+        var links = []
+        for (var i = myDropzone.files.length - 1; i >= 0; i--) {
+            if (myDropzone.files[i].status == "success") {
+                links.push('optimized' + myDropzone.files[i].name)
+            }
+        }
+        // console.log(links);
+        var dataToSend = {}
+        dataToSend['files'] = links
+        dataToSend['action'] = 'download_all_button'
+        console.log('dataToSend:', dataToSend)
+        jQuery.ajax({
+            url: admin_ajax_url,
+            data: dataToSend,
+            type: 'POST',
+            success: function(data) {
+                console.log('data:', data)
+                downloadURI(data, 'compressedImages.zip')
+            },
+            failure: function(data) {},
+            error: function(data) {}
+        })
+        console.log('selesai download')
+    })
 
     function getImageSize(URL) {
         return new Promise(function (resolve, reject) {

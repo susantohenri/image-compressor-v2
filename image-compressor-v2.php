@@ -139,3 +139,51 @@ add_shortcode('image-compressor-v2', function () {
         </div>
     ";
 });
+
+add_action('wp_ajax_get_image_size', 'get_image_size_v2');
+add_action('wp_ajax_nopriv_get_image_size', 'get_image_size_v2');
+
+function get_image_size_v2()
+{
+	$image_url = $_POST['url'];
+	$image_path = parse_url($image_url, PHP_URL_PATH);
+	clearstatcache();
+	echo filesize($_SERVER['DOCUMENT_ROOT'] . $image_path);
+	wp_die();
+}
+
+add_action('wp_ajax_quality_change_of_picture', 'quality_change_callback_v2');
+add_action('wp_ajax_nopriv_quality_change_of_picture', 'quality_change_callback_v2');
+
+function quality_change_callback_v2()
+{
+	require dirname(__FILE__) . '/upload.php';
+	compressor($_POST, true);
+	wp_die();
+}
+
+add_action('wp_ajax_download_all_button', 'download_all_button_callback_v2');
+add_action('wp_ajax_nopriv_download_all_button', 'download_all_button_callback_v2');
+
+function download_all_button_callback_v2()
+{
+	$fileLinks = $_POST['files'];
+	$zip = new ZipArchive;
+	$ds = '/';
+	$storeFolder = 'uploads';
+	$targetPath = dirname(__FILE__) . $ds . $storeFolder . $ds;
+	$tmp_file = $targetPath . 'compressedImages.zip';
+	if (file_exists($tmp_file)) {
+		unlink($tmp_file);
+	}
+	if ($zip->open($tmp_file,  ZipArchive::CREATE)) {
+		for ($i = 0; $i < sizeof($fileLinks); $i++) {
+			$zip->addFile(dirname(__FILE__) . '/uploads/' . $fileLinks[$i], $fileLinks[$i]);
+		}
+		$zip->close();
+		echo plugin_dir_url(__FILE__) . $storeFolder . $ds . 'compressedImages.zip' . "\n";
+	} else {
+		die('could not open archive');
+	}
+	wp_die();
+}
