@@ -8,7 +8,7 @@ window.onload = function () {
                 src: plugin_dir_url + 'uploads/bg_auth.jpg',
             },
             {
-                src: plugin_dir_url + 'uploads/bg_auth.jpg',
+                src: plugin_dir_url + 'uploads/optimizedbg_auth.jpg',
             }
         ],
         {
@@ -152,11 +152,11 @@ window.onload = function () {
                 links.push('optimized' + myDropzone.files[i].name)
             }
         }
-        
+
         var dataToSend = {}
         dataToSend['files'] = links
         dataToSend['action'] = 'download_all_button'
-        
+
         jQuery.ajax({
             url: admin_ajax_url,
             data: dataToSend,
@@ -268,7 +268,7 @@ window.onload = function () {
         })
     }
 
-    jQuery('#quality_form_submit').on('click', function(e) {
+    jQuery('#quality_form_submit').on('click', function (e) {
         e.preventDefault()
         // jQuery('#clickPreventer').fadeIn()
         var dataToSend = {}
@@ -279,28 +279,52 @@ window.onload = function () {
         dataToSend['originalfilename'] = originalfilename
         dataToSend['optimizedfilename'] = optimizedfilename
 
-        recompress(dataToSend).then(function(data) {
-            console.log(data)
+        recompress(dataToSend).then(function (data) {
+            console.log('sini')
             previewFunc()
             // jQuery('#clickPreventer').fadeOut()
-        }).catch(function(err) {
-            // alert("error")
+
+            // regenerate image for slider with new quality
+            // unregister slider first
+            // slider.unregister()
+            // slider = null
+            jQuery('#JXSlider').html('')
+
+            slider = new juxtapose.JXSlider('#JXSlider',
+                [
+                    {
+                        src: plugin_dir_url + 'uploads/bg_auth.jpg',
+                    },
+                    {
+                        src: plugin_dir_url + 'uploads/optimizedbg_auth.jpg',
+                    }
+                ],
+                {
+                    animate: true,
+                    showLabels: true,
+                    showCredits: true,
+                    startingPosition: "50%",
+                    makeResponsive: true
+                }
+            )
+        }).catch(function (err) {
             console.log(err)
+            // alert("error")
             // jQuery('#clickPreventer').fadeOut()
         })
 
     })
 
     function recompress(dataToSend) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             jQuery.ajax({
                 url: admin_ajax_url,
                 data: dataToSend,
                 type: 'POST',
-                success: function(data) {
+                success: function (data) {
                     resolve(data)
                 },
-                error: function(err) {
+                error: function (err) {
                     reject(err)
                 }
             });

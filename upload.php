@@ -62,10 +62,10 @@ function compressor($FILES, $recompress=false){
                     '-o2',
                     '-quiet',
                 ]);
-        $gifSicleObject->setBinaryPath(__DIR__.'/');
-        $JpegoptimObject->setBinaryPath(__DIR__.'/');
-        $PngquantObject->setBinaryPath(__DIR__.'/');
-        $OptipngObject->setBinaryPath(__DIR__.'/');
+        $gifSicleObject->setBinaryPath(__DIR__ . '/bin');
+        $JpegoptimObject->setBinaryPath(__DIR__ . '/bin');
+        $PngquantObject->setBinaryPath(__DIR__ . '/bin');
+        $OptipngObject->setBinaryPath(__DIR__ . '/bin');
         $optimizerChain->addOptimizer($JpegoptimObject)
 
                 ->addOptimizer($PngquantObject)
@@ -108,10 +108,10 @@ function compressor($FILES, $recompress=false){
 	                    '-o2',
 	                    '-quiet',
 	                ]);
-	        $gifSicleObject->setBinaryPath(__DIR__.'/');
-	        $JpegoptimObject->setBinaryPath('/usr/bin');
-	        $PngquantObject->setBinaryPath(__DIR__.'/');
-	        $OptipngObject->setBinaryPath(__DIR__.'/');
+	        $gifSicleObject->setBinaryPath(__DIR__ . '/bin');
+	        $JpegoptimObject->setBinaryPath(__DIR__ . '/bin');
+	        $PngquantObject->setBinaryPath(__DIR__ . '/bin');
+	        $OptipngObject->setBinaryPath(__DIR__ . '/bin');
         	$optimizerChain->addOptimizer($JpegoptimObject)
                 ->addOptimizer($PngquantObject)
                 ->addOptimizer($OptipngObject)
