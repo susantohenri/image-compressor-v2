@@ -122,7 +122,7 @@ add_shortcode('image-compressor-v2', function () {
                 <div class='text-before'><strong></strong></div>
                 <div class='text-after'><strong></strong></div>
             </div>
-            <div class='custom_wrapper_two adjuster'>
+            <div class='custom_wrapper_two adjuster display-none'>
                 <div id='jxslider' class=''></div>
                 <div id='quality_range'>
                     <form id='quality_form'>

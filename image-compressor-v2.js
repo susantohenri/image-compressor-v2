@@ -17,24 +17,6 @@ window.onload = function () {
         jQuery('#value_in_number').html(e.detail.value)
     })
 
-    let slider = new juxtapose.JXSlider('#jxslider', [
-        {
-            src: plugin_dir_url + 'giphy.gif?cache-breaker=' + new Date().getTime(),
-        },
-        {
-            src: plugin_dir_url + 'giphy2.gif?cache-breaker=' + new Date().getTime(),
-        }
-    ], {
-        animate: true,
-        showLabels: false,
-        showCredits: false,
-        startingPosition: '50%',
-    })
-
-    setTimeout(function () {
-        jQuery('.custom_wrapper_two.adjuster').addClass('display-none')
-    }, 100)
-
     var myDropzone = new Dropzone("#dropzone", {
         previewTemplate: jQuery('#previewTemplate').html(),
         filesizeBase: 1024,
@@ -155,7 +137,6 @@ window.onload = function () {
 
     jQuery('image-compressor-v2 .remove-icon').on('click', function () {
         // remove the file
-        console.log(file)
         myDropzone.removeFile(file)
     })
 
@@ -240,23 +221,23 @@ window.onload = function () {
             lastPreviewElement = this
         }
 
-        var filename = jQuery(lastPreviewElement).find('.dz-c-filename span').html()
-        var img1source = plugin_dir_url + 'uploads/' + filename
-        var img2source = plugin_dir_url + 'uploads/' + 'optimized' + filename
+        let filename = jQuery(lastPreviewElement).find('.dz-c-filename span').html()
+        let img1source = plugin_dir_url + 'uploads/' + filename
+        let img2source = plugin_dir_url + 'uploads/' + 'optimized' + filename
 
-        var afterImage = new Image()
+        let afterImage = new Image()
         jQuery(afterImage).on('load', function () {
             // jQuery('#container .img-comp-img img').first().attr('src', this.src)
             updateCompressionPercentage(this.src, lastPreviewElement)
-            var img2size = 0
+            let img2size = 0
             getImageSize(this.src).then(function (size) {
                 img2size = formatBytes(size)
-                var newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(lastPreviewElement).find('[data-dz-size]').html()))
+                let newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(lastPreviewElement).find('[data-dz-size]').html()))
                 newSize = Number(newSize).toFixed(2)
                 jQuery(lastPreviewElement).find('.percentage').html('-' + newSize + '%')
                 jQuery(lastPreviewElement).data('image2Size', img2size)
                 jQuery(lastPreviewElement).data('reducedPercentage', newSize)
-                var image2Size = jQuery(lastPreviewElement).data('image2Size')
+                let image2Size = jQuery(lastPreviewElement).data('image2Size')
                 jQuery('.text-after > strong').html('Compressed: ' + image2Size + ' (-' + jQuery(lastPreviewElement).data('reducedPercentage') + '%)')
                 jQuery(afterImage).off('load')
             }).catch(function (err) {
@@ -303,9 +284,11 @@ window.onload = function () {
 
     jQuery('#quality_form_submit').on('click', function (e) {
         e.preventDefault()
-        var dataToSend = {}
-        var optimizedfilename = plugin_dir_url + 'uploads/optimizedbg_auth.jpg'
-        var originalfilename = plugin_dir_url + 'uploads/bg_auth.jpg'
+        let dataToSend = {}
+        let filename = jQuery(lastPreviewElement).find('.dz-c-filename span').html()
+        let originalfilename = plugin_dir_url + 'uploads/' + filename
+        let optimizedfilename = plugin_dir_url + 'uploads/' + 'optimized' + filename
+        
         dataToSend['action'] = 'quality_change_of_picture'
         dataToSend['quality'] = jQuery('#value_in_number').html()
         dataToSend['originalfilename'] = originalfilename
