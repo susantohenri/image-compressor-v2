@@ -22,6 +22,7 @@
 
 add_shortcode('image-compressor-v2', function () {
     $plugin_dir_url = plugin_dir_url(__FILE__);
+    $time = time();
 
     wp_register_script('dropzone_script', 'https://unpkg.com/dropzone@5/dist/min/dropzone.min.js', array('jquery'));
     wp_enqueue_script('dropzone_script');
@@ -49,6 +50,14 @@ add_shortcode('image-compressor-v2', function () {
 
 	wp_register_script('image-compressor-v2', "{$plugin_dir_url}image-compressor-v2.js?cache-breaker=" . time());
     wp_enqueue_script('image-compressor-v2');
+
+    // delete all files in the uploads folder
+    $files = glob(plugin_dir_path(__FILE__) . 'uploads/*');
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            unlink($file);
+        }
+    }
 
     return "
         <div class='image-compressor-v2'>
@@ -113,16 +122,8 @@ add_shortcode('image-compressor-v2', function () {
                 <div class='text-before'><strong></strong></div>
                 <div class='text-after'><strong></strong></div>
             </div>
-            <div class='custom_wrapper_two adjuster display-nonex'>
-                <div id='JXSlider'></div>
-                <div id='container' class='img-comp-container display-none'>
-                    <div class='img-comp-img'>
-                        <img class='image' src='{$plugin_dir_url}giphy.gif'>
-                    </div>
-                    <div class='img-comp-img img-comp-overlay'>
-                        <img class='image' src='{$plugin_dir_url}giphy2.gif'>
-                    </div>
-                </div>
+            <div class='custom_wrapper_two adjuster'>
+                <div id='jxslider' class=''></div>
                 <div id='quality_range'>
                     <form id='quality_form'>
                         <div id='quality_value_wrapper'>
@@ -187,4 +188,15 @@ function download_all_button_callback_v2()
 		die('could not open archive');
 	}
 	wp_die();
+}
+
+add_action('wp_ajax_delete_all_files', 'delete_files_callback_v2');
+
+function delete_files_callback_v2()
+{
+    $files = $_POST['files'];
+    for ($i = 0; $i < sizeof($files); $i++) {
+        unlink(dirname(__FILE__) . '/uploads/' . $files[$i]);
+    }
+    wp_die();
 }

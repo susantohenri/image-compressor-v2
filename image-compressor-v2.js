@@ -2,24 +2,6 @@ window.onload = function () {
     var plugin_dir_url = jQuery('input[name="plugin_dir_url"]').val()
     var admin_ajax_url = jQuery('input[name="admin_ajax_url"]').val()
 
-    let slider = new juxtapose.JXSlider('#JXSlider',
-        [
-            {
-                src: plugin_dir_url + 'uploads/bg_auth.jpg',
-            },
-            {
-                src: plugin_dir_url + 'uploads/optimizedbg_auth.jpg',
-            }
-        ],
-        {
-            animate: true,
-            showLabels: true,
-            showCredits: true,
-            startingPosition: "50%",
-            makeResponsive: true
-        }
-    )
-
     var mySlider = new RangeSliderPips({
         target: document.querySelector("#my-slider"),
         props: {
@@ -35,6 +17,24 @@ window.onload = function () {
         jQuery('#value_in_number').html(e.detail.value)
     })
 
+    let slider = new juxtapose.JXSlider('#jxslider', [
+        {
+            src: plugin_dir_url + 'giphy.gif?cache-breaker=' + new Date().getTime(),
+        },
+        {
+            src: plugin_dir_url + 'giphy2.gif?cache-breaker=' + new Date().getTime(),
+        }
+    ], {
+        animate: true,
+        showLabels: false,
+        showCredits: false,
+        startingPosition: '50%',
+    })
+
+    setTimeout(function () {
+        jQuery('.custom_wrapper_two.adjuster').addClass('display-none')
+    }, 100)
+
     var myDropzone = new Dropzone("#dropzone", {
         previewTemplate: jQuery('#previewTemplate').html(),
         filesizeBase: 1024,
@@ -49,7 +49,8 @@ window.onload = function () {
         },
         init: function () {
             this.on("removedfile", file => {
-                jQuery('.custom_wrapper.custom_wrapper_two').addClass('display-none')
+                jQuery('.custom_wrapper_two.result').addClass('display-none')
+                jQuery('.custom_wrapper_two.adjuster').addClass('display-none')
                 var errored = 0
                 for (var i = this.files.length - 1; i >= 0; i--) {
                     if (this.files[i].status == 'error') {
@@ -60,6 +61,24 @@ window.onload = function () {
                     jQuery('#clearQBtn').addClass('disabled')
                     jQuery('#downloadAllBtn').addClass('disabled')
                 }
+
+                let img1source = file.upload.filename
+                let img2source = 'optimized' + file.upload.filename
+                
+                jQuery.ajax({
+                    url: admin_ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'delete_all_files',
+                        files: [img1source, img2source]
+                    },
+                    success: function (response) {
+                        // console.log(response)
+                    },
+                    error: function (error) {
+                        // console.log(error)
+                    }
+                })
             })
             this.on("addedfile", file => {
                 file.previewElement.querySelector('[data-dz-name]').textContent = file.upload.filename
@@ -132,8 +151,13 @@ window.onload = function () {
 
     jQuery('#clearQBtn').on('click', function () {
         myDropzone.removeAllFiles()
-        // $('dz-preview').remove();
     });
+
+    jQuery('image-compressor-v2 .remove-icon').on('click', function () {
+        // remove the file
+        console.log(file)
+        myDropzone.removeFile(file)
+    })
 
     function downloadURI(uri, name) {
         var link = document.createElement("a")
@@ -180,7 +204,6 @@ window.onload = function () {
                 url: admin_ajax_url,
                 data: dataToSend,
                 success: function (data) {
-                    console.log("image size is: " + data)
                     resolve(data)
                 },
                 error: function (err) {
@@ -221,15 +244,13 @@ window.onload = function () {
         var img1source = plugin_dir_url + 'uploads/' + filename
         var img2source = plugin_dir_url + 'uploads/' + 'optimized' + filename
 
-        var previewElementV = jQuery(lastPreviewElement)
         var afterImage = new Image()
         jQuery(afterImage).on('load', function () {
-            jQuery('#container .img-comp-img img').first().attr('src', this.src)
+            // jQuery('#container .img-comp-img img').first().attr('src', this.src)
             updateCompressionPercentage(this.src, lastPreviewElement)
             var img2size = 0
             getImageSize(this.src).then(function (size) {
                 img2size = formatBytes(size)
-                var img2 = jQuery('#container .img-comp-img img').first()
                 var newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(lastPreviewElement).find('[data-dz-size]').html()))
                 newSize = Number(newSize).toFixed(2)
                 jQuery(lastPreviewElement).find('.percentage').html('-' + newSize + '%')
@@ -241,8 +262,6 @@ window.onload = function () {
             }).catch(function (err) {
                 console.log('error: ' + err)
             })
-
-
         })
 
         afterImage.src = img2source
@@ -250,16 +269,30 @@ window.onload = function () {
         var imgSize = jQuery(lastPreviewElement).find('.dz-size span').html()
         imgSize = formatBytes(imgSize)
         jQuery('.text-before > strong').html('Original: ' + imgSize)
+
+        jQuery('#jxslider').html(``)
+        let slider = new juxtapose.JXSlider('#jxslider', [
+            {
+                src: img1source + '?cache-breaker=' + new Date().getTime(),
+            },
+            {
+                src: img2source + '?cache-breaker=' + new Date().getTime(),
+            }
+        ], {
+            animate: true,
+            showLabels: true,
+            showCredits: false,
+            startingPosition: '50%',
+        })
+
     }
 
     function updateCompressionPercentage(img2source, previewElem) {
         var img2size = 0
         getImageSize(img2source).then(function (size) {
             img2size = formatBytes(size)
-            var img2 = jQuery('#container .img-comp-img img').first()
             var newSize = 100 - parseFloat((100 * parseFloat(size)) / parseFloat(jQuery(previewElem).find('[data-dz-size]').html()))
             newSize = Number(newSize).toFixed(2)
-            console.log('image 2 latest size is: ' + img2size)
             jQuery(previewElem).find('.percentage').html('-' + newSize + '%')
             jQuery(previewElem).data('image2Size', img2size)
             jQuery(previewElem).data('reducedPercentage', newSize)
@@ -270,7 +303,6 @@ window.onload = function () {
 
     jQuery('#quality_form_submit').on('click', function (e) {
         e.preventDefault()
-        // jQuery('#clickPreventer').fadeIn()
         var dataToSend = {}
         var optimizedfilename = plugin_dir_url + 'uploads/optimizedbg_auth.jpg'
         var originalfilename = plugin_dir_url + 'uploads/bg_auth.jpg'
@@ -280,37 +312,9 @@ window.onload = function () {
         dataToSend['optimizedfilename'] = optimizedfilename
 
         recompress(dataToSend).then(function (data) {
-            console.log('sini')
             previewFunc()
-            // jQuery('#clickPreventer').fadeOut()
-
-            // regenerate image for slider with new quality
-            // unregister slider first
-            // slider.unregister()
-            // slider = null
-            jQuery('#JXSlider').html('')
-
-            slider = new juxtapose.JXSlider('#JXSlider',
-                [
-                    {
-                        src: plugin_dir_url + 'uploads/bg_auth.jpg',
-                    },
-                    {
-                        src: plugin_dir_url + 'uploads/optimizedbg_auth.jpg',
-                    }
-                ],
-                {
-                    animate: true,
-                    showLabels: true,
-                    showCredits: true,
-                    startingPosition: "50%",
-                    makeResponsive: true
-                }
-            )
         }).catch(function (err) {
             console.log(err)
-            // alert("error")
-            // jQuery('#clickPreventer').fadeOut()
         })
 
     })
