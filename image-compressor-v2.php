@@ -61,9 +61,6 @@ add_shortcode('image-compressor-v2', function () {
 
     return "
         <div class='image-compressor-v2'>
-            <script type='text/javascript'>
-                Dropzone.autoDiscover = false;
-            </script>
             <input type='hidden' name='plugin_dir_url' value=". plugin_dir_url(__FILE__) .">
             <input type='hidden' name='admin_ajax_url' value=". admin_url('admin-ajax.php') .">
             

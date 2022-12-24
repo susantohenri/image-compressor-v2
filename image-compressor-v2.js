@@ -1,3 +1,4 @@
+Dropzone.autoDiscover = false;
 window.onload = function () {
     var plugin_dir_url = jQuery('input[name="plugin_dir_url"]').val()
     var admin_ajax_url = jQuery('input[name="admin_ajax_url"]').val()
