@@ -20,6 +20,14 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  */
 
+register_activation_hook(__FILE__, function () {
+    chmod(__DIR__ . '/bin/gifdiff', 0777);
+    chmod(__DIR__ . '/bin/gifsicle', 0777);
+    chmod(__DIR__ . '/bin/jpegoptim', 0777);
+    chmod(__DIR__ . '/bin/optipng', 0777);
+    chmod(__DIR__ . '/bin/pngquant', 0777);
+});
+
 add_shortcode('image-compressor-v2', function () {
     $plugin_dir_url = plugin_dir_url(__FILE__);
     $time = time();
